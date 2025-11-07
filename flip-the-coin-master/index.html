@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="icon" href="resources/favicon.ico" type="image/x-icon" sizes="96x96" />
+
+  <title>Flip the coin | devChallenges.io</title>
+
+  <!--You are welcome to delete these styles or modify them in your own stylesheet -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --accent: #7c3aed;
+      --muted: #6b7280;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--bg), #ffffff);
+      color: #111827;
+    }
+
+    .container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 900px;
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .title {
+      font-weight: 700;
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 18px;
+    }
+
+    /* Coin area */
+    .play-area {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .coin-wrap {
+      width: 180px;
+      height: 180px;
+      perspective: 1000px;
+      cursor: pointer;
+    }
+
+    .coin {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(#f97316 0deg, #f59e0b 90deg, #f97316 180deg, #f59e0b 270deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+      transform-style: preserve-3d;
+      transition: transform 1.2s cubic-bezier(.2, .8, .2, 1);
+      box-shadow: 0 10px 25px rgba(2, 6, 23, 0.12);
+    }
+
+    .coin.flipping {
+      transition: none;
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      border-radius: 50%;
+    }
+
+    .controls-title {
+      font-weight: 600;
+      margin-bottom: 6px
+    }
+
+    .sidebar-title {
+      font-weight: 700
+    }
+
+    .face.front {
+      transform: rotateY(0deg) translateZ(1px);
+    }
+
+    .face.back {
+      transform: rotateY(180deg) translateZ(1px);
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 0;
+      cursor: pointer;
+      font-weight: 600;
+      background: linear-gradient(90deg, var(--accent), #5b21b6);
+      color: white;
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.14);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--muted);
+      box-shadow: none;
+      border: 1px solid #e6e6e6;
+    }
+
+    /* sidebar */
+    .sidebar {
+      padding: 18px;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #fbfbff, #ffffff);
+      border: 1px solid #f3f4f6;
+    }
+
+    .stats {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      align-items: center;
+    }
+
+    .stat {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #f3f4f6;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 20px
+    }
+
+    .stat small {
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .author-info {
+      font-size: 13px;
+      text-align: center;
+      margin-top: 18px;
+      color: var(--muted);
+    }
+
+    .author-info a {
+      text-decoration: none;
+      color: inherit;
+      font-weight: 600
+    }
+
+    @media (max-width:820px) {
+      .card {
+        grid-template-columns: 1fr;
+      }
+
+      .coin-wrap {
+        margin: 0 auto
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 
+
+    Flip a Coin Game
+    Press the coin or the button to flip the coin
+    Head
+    Tail
+    Random
+  
+    -->
+
+  <div class="container">
+    <div class="card">
+      <div>
+        <div class="title">Flip a Coin Game</div>
+        <div class="subtitle">Press the coin or the button to flip the coin — Heads, Tails or Random.</div>
+
+        <div class="play-area">
+          <div class="coin-wrap" id="coinWrap" title="Click to flip">
+            <div class="coin" id="coin" aria-live="polite">
+              <div class="face front" id="front">HEAD</div>
+              <div class="face back" id="back">TAIL</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="controls-title">Controls</div>
+            <div class="controls">
+              <button class="btn" id="flipBtn">Flip</button>
+              <button class="btn secondary" id="randomBtn">Random (50/50)</button>
+              <button class="btn secondary" id="resetBtn">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="author-info">Coded by <a href="#">Goutham D</a> | Challenge by <a
+            href="https://www.devchallenges.io?ref=challenge" target="_blank"
+            rel="noopener noreferrer">devChallenges.io</a>.</div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="sidebar-title">Results</div>
+        <div class="subtitle">Track how many times each side appears.</div>
+        <div class="stats">
+          <div class="stat">
+            <strong id="headsCount">0</strong>
+            <small>Heads</small>
+          </div>
+          <div class="stat">
+            <strong id="tailsCount">0</strong>
+            <small>Tails</small>
+          </div>
+          <div class="stat">
+            <strong id="totalCount">0</strong>
+            <small>Total</small>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // Simple flip-a-coin JS
+    (function () {
+      const coin = document.getElementById('coin');
+      const coinWrap = document.getElementById('coinWrap');
+      const flipBtn = document.getElementById('flipBtn');
+      const randomBtn = document.getElementById('randomBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const headsCountEl = document.getElementById('headsCount');
+      const tailsCountEl = document.getElementById('tailsCount');
+      const totalCountEl = document.getElementById('totalCount');
+
+      let heads = 0, tails = 0, total = 0;
+      let currentRotation = 0;
+      let isFlipping = false;
+
+      function updateStats() {
+        headsCountEl.textContent = heads;
+        tailsCountEl.textContent = tails;
+        totalCountEl.textContent = total;
+      }
+
+      function doFlip(result) {
+        if (isFlipping) return;
+        isFlipping = true;
+        // Add some randomness to rotation so it looks natural
+        const spins = 4 + Math.floor(Math.random() * 4);
+        // result: 'head'|'tail'|null(random)
+        const wantHead = result === 'head' ? true : result === 'tail' ? false : Math.random() < 0.5;
+
+        // Determine final rotation so front (HEAD) or back (TAIL) faces up.
+        // We'll use rotation around Y. 0deg => front up, 180deg => back up
+        // Each full spin is 360deg.
+        const finalY = spins * 360 + (wantHead ? 0 : 180);
+        currentRotation = currentRotation + finalY;
+
+        coin.style.transition = 'transform 1.2s cubic-bezier(.2,.8,.2,1)';
+        coin.style.transform = `rotateY(${currentRotation}deg)`;
+
+        // announce and count after animation
+        setTimeout(() => {
+          isFlipping = false;
+          const winner = wantHead ? 'head' : 'tail';
+          if (winner === 'head') heads += 1; else tails += 1;
+          total += 1;
+          updateStats();
+          coin.setAttribute('aria-label', winner === 'head' ? 'Heads' : 'Tails');
+        }, 1200);
+      }
+
+      // Click coin or button => flip
+      coinWrap.addEventListener('click', () => doFlip(null));
+      flipBtn.addEventListener('click', () => doFlip(null));
+      randomBtn.addEventListener('click', () => doFlip(null));
+
+      // Keyboard: space flips
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          doFlip(null);
+        }
+      });
+
+      resetBtn.addEventListener('click', () => {
+        heads = 0; tails = 0; total = 0; currentRotation = 0; isFlipping = false;
+        coin.style.transition = 'transform 400ms ease';
+        coin.style.transform = `rotateY(0deg)`;
+        updateStats();
+        coin.setAttribute('aria-label', 'Coin reset');
+      });
+
+      // initial stats
+      updateStats();
+    })();
+  </script>
+</body>
+
+</html>
